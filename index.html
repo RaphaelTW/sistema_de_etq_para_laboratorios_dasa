@@ -1,468 +1,373 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Etiquetas 5x5</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Etiquetas 5x5</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- JS Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <!-- Bibliotecas externas -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
-    <!-- ✅ Biblioteca DOCX correta -->
-    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.global.min.js"></script>
+  <!-- Bibliotecas para gerar PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <style>
-      body {
-        background-color: #f8f9fa;
-        padding: 20px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      }
+  <style>
+    body {
+      background-color: #f8f9fa;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-      .container {
-        max-width: 800px;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-        margin-top: 20px;
-      }
+    .container {
+      max-width: 800px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin-top: 20px;
+    }
 
-      .header {
-        text-align: center;
-        margin-bottom: 30px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #e9ecef;
-      }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #e9ecef;
+    }
 
-      .header h1 {
-        color: #2c3e50;
-        font-weight: 600;
-      }
+    .header h1 {
+      color: #2c3e50;
+      font-weight: 600;
+    }
 
-      .header p {
-        color: #7f8c8d;
-        margin-top: 10px;
-      }
+    .header p {
+      color: #7f8c8d;
+      margin-top: 10px;
+    }
 
-      .form-section {
-        margin-bottom: 25px;
-        padding: 20px;
-        border-radius: 8px;
-        background-color: #f8f9fa;
-        border-left: 4px solid #3498db;
-      }
+    .form-section {
+      margin-bottom: 25px;
+      padding: 20px;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+      border-left: 4px solid #3498db;
+    }
 
-      .preview-container {
-        border: 1px dashed #ccc;
-        padding: 15px;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-        margin-top: 20px;
-      }
+    .preview-container {
+      border: 1px dashed #ccc;
+      padding: 15px;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+      margin-top: 20px;
+    }
 
-      .etiqueta-preview {
-        width: 5cm;
-        height: 5cm;
-        border: 1px solid #000;
-        padding: 10px;
-        margin: 10px;
-        display: inline-block;
-        vertical-align: top;
-        background-color: white;
-        font-family: Arial, sans-serif;
-        font-size: 12px;
-        position: relative;
-        box-sizing: border-box;
-      }
+    .etiqueta-preview {
+      width: 5cm;
+      height: 5cm;
+      border: 1px solid #000;
+      padding: 10px;
+      margin: 10px;
+      display: inline-block;
+      vertical-align: top;
+      background-color: white;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      position: relative;
+      box-sizing: border-box;
+    }
 
-      .qrcode-container {
-        position: absolute;
-        bottom: 5px;
-        right: 5px;
-        width: 50px;
-        height: 50px;
-      }
+    .qrcode-container {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      width: 50px;
+      height: 50px;
+    }
 
-      .btn-group {
-        margin-top: 20px;
-        display: flex;
-        gap: 10px;
-      }
+    .btn-group {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
 
-      .btn-custom {
-        flex: 1;
-        padding: 12px;
-        font-weight: 600;
-      }
+    .btn-custom {
+      flex: 1;
+      padding: 12px;
+      font-weight: 600;
+    }
 
-      .required::after {
-        content: " *";
-        color: red;
-      }
+    .required::after {
+      content: " *";
+      color: red;
+    }
 
-      .etiqueta-content {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
+    .etiqueta-content {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
 
-      .etiqueta-header {
-        text-align: center;
-        font-weight: bold;
-        margin-bottom: 10px;
-      }
+    .etiqueta-header {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
 
-      .etiqueta-body {
-        flex-grow: 1;
-      }
+    .etiqueta-body {
+      flex-grow: 1;
+    }
 
-      .etiqueta-footer {
-        text-align: center;
-        font-size: 10px;
-        margin-top: 5px;
-      }
+    .etiqueta-footer {
+      text-align: center;
+      font-size: 10px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
 
-    </style>
-  </head>
-
-  <body>
-    <div class="container">
-      <div class="header">
-        <h1>Sistema de Etiquetas 5x5</h1>
-        <p>Gere etiquetas para testes de preparo de forma rápida e fácil</p>
-      </div>
-
-      <form id="etiquetaForm">
-        <div class="form-section">
-          <h4>Dados da Etiqueta</h4>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="tipo" class="form-label required">Tipo</label>
-              <select class="form-select" id="tipo" name="tipo">
-                <option value="CAL 0">CAL 0</option>
-                <option value="BAIXO">BAIXO</option>
-                <option value="MÉDIO" selected>MÉDIO</option>
-                <option value="ALTO">ALTO</option>
-                <option value="Teste de Preparo">Teste de Preparo'</option>
-                <option value="curva_de_calibracao">Curva de Calibração</option>
-                <option value="sst">SST</option>
-              </select>
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="ps" class="form-label required">PS</label>
-              <input type="number" class="form-control" id="ps" name="ps" value="-25">
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="prep" class="form-label required">Data de Preparo</label>
-              <input type="date" class="form-control" id="prep" name="prep">
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="quantidade" class="form-label">Quantidade</label>
-              <input type="number" class="form-control" id="quantidade" name="quantidade" min="1" max="20" value="4">
-            </div>
-          </div>
-          <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="incluirQRCode" name="incluirQRCode" checked>
-            <label class="form-check-label" for="incluirQRCode">
-              Incluir QR Code na etiqueta
-            </label>
-          </div>
-        </div>
-
-        <div class="btn-group">
-          <button type="button" class="btn btn-primary btn-custom" id="btnPreview">Visualizar Etiquetas</button>
-          <button type="button" class="btn btn-success btn-custom" id="btnGerarWord">Gerar Documento Word</button>
-        </div>
-      </form>
-
-      <div class="preview-container" id="previewContainer" style="display: none;">
-        <h5>Pré-visualização das Etiquetas</h5>
-        <div id="etiquetasPreview"></div>
-      </div>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Sistema de Etiquetas 5x5</h1>
+      <p>Gere etiquetas para testes de preparo de forma rápida e fácil</p>
     </div>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        // Definir data atual como padrão
-        const hoje = new Date();
-        const dataFormatada = hoje.toISOString().split('T')[0];
-        document.getElementById('prep').value = dataFormatada;
+    <form id="etiquetaForm">
+      <div class="form-section">
+        <h4>Dados da Etiqueta</h4>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="tipo" class="form-label required">Tipo</label>
+            <select class="form-select" id="tipo" name="tipo">
+              <option value="CAL 0">CAL 0</option>
+              <option value="BAIXO">BAIXO</option>
+              <option value="MÉDIO" selected>MÉDIO</option>
+              <option value="ALTO">ALTO</option>
+              <option value="Teste de Preparo">Teste de Preparo</option>
+              <option value="Curva de Calibração">Curva de Calibração</option>
+              <option value="SST">SST</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="ps" class="form-label required">PS</label>
+            <input type="number" class="form-control" id="ps" name="ps" value="-25">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="prep" class="form-label required">Data de Preparo</label>
+            <input type="date" class="form-control" id="prep" name="prep">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="quantidade" class="form-label">Quantidade</label>
+            <input type="number" class="form-control" id="quantidade" name="quantidade" min="1" max="20" value="4">
+          </div>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="incluirQRCode" name="incluirQRCode" checked>
+          <label class="form-check-label" for="incluirQRCode">
+            Incluir QR Code na etiqueta
+          </label>
+        </div>
+      </div>
 
-        // Evento para visualizar etiquetas
-        document.getElementById('btnPreview').addEventListener('click', function () {
-          if (validarFormulario()) {
-            gerarPreview();
-          }
-        });
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary btn-custom" id="btnPreview">Visualizar Etiquetas</button>
+        <button type="button" class="btn btn-danger btn-custom" id="btnGerarPDF">Gerar PDF</button>
+      </div>
+    </form>
 
-        // Evento para gerar documento Word
-        document.getElementById('btnGerarWord').addEventListener('click', function () {
-          if (validarFormulario()) {
-            gerarDocumentoWord();
-          }
-        });
+    <div class="preview-container" id="previewContainer" style="display: none;">
+      <h5>Pré-visualização das Etiquetas</h5>
+      <div id="etiquetasPreview"></div>
+    </div>
+  </div>
 
-        // Função para validar formulário
-        function validarFormulario() {
-          const camposObrigatorios = ['tipo', 'ps', 'prep'];
-          const camposFaltando = [];
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
 
-          camposObrigatorios.forEach(campo => {
-            const elemento = document.getElementById(campo);
-            if (!elemento.value) {
-              camposFaltando.push(elemento.previousElementSibling.textContent.replace(' *', ''));
-            }
-          });
+      // Define a data atual como padrão
+      const hoje = new Date();
+      const dataFormatada = hoje.toISOString().split('T')[0];
+      document.getElementById('prep').value = dataFormatada;
 
-          if (camposFaltando.length > 0) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Campos obrigatórios',
-              html: `Os seguintes campos são obrigatórios:<br><strong>${camposFaltando.join(', ')}</strong>`,
-              confirmButtonText: 'Entendi'
-            });
-            return false;
-          }
-
-          return true;
-        }
-
-        // Função para formatar data no padrão DD/MM/AA
-        function formatarData(dataISO) {
-          const data = new Date(dataISO);
-          const dia = String(data.getDate()).padStart(2, '0');
-          const mes = String(data.getMonth() + 1).padStart(2, '0');
-          const ano = String(data.getFullYear()).slice(-2);
-          return `${dia}/${mes}/${ano}`;
-        }
-
-        // Função para gerar QR Code
-        function gerarQRCode(texto, container) {
-          const tipoNumero = 0;
-          const correcaoErro = 'L';
-          const qr = qrcode(tipoNumero, correcaoErro);
-          qr.addData(texto);
-          qr.make();
-
-          container.innerHTML = qr.createImgTag(5);
-        }
-
-        // Função para gerar preview das etiquetas
-        function gerarPreview() {
-          const container = document.getElementById('etiquetasPreview');
-          container.innerHTML = '';
-
-          const quantidade = parseInt(document.getElementById('quantidade').value);
-          const dados = obterDadosFormulario();
-
-          for (let i = 0; i < quantidade; i++) {
-            const etiqueta = document.createElement('div');
-            etiqueta.className = 'etiqueta-preview';
-
-            let conteudo = `
-                        <div class="etiqueta-content">
-                            <div class="etiqueta-header">Teste de Preparo</div>
-                            <div class="etiqueta-body">
-                                <div style="text-align: center; margin-bottom: 10px; font-weight: bold;">
-                                    ${dados.tipo}
-                                </div>
-                                <div style="margin-bottom: 5px;">PS. ${dados.ps}</div>
-                                <div style="margin-bottom: 5px;">PREP: ${dados.prepFormatado}</div>
-                            </div>
-                    `;
-
-            // Adicionar QR Code se solicitado
-            if (document.getElementById('incluirQRCode').checked) {
-              conteudo += `
-                            <div class="qrcode-container">
-                                <!-- QR Code será inserido aqui -->
-                            </div>
-                        `;
-            }
-
-            conteudo += `</div>`;
-
-            etiqueta.innerHTML = conteudo;
-
-            // Adicionar QR Code se solicitado
-            if (document.getElementById('incluirQRCode').checked) {
-              const qrContainer = etiqueta.querySelector('.qrcode-container');
-              const textoQR = `Teste de Preparo|${dados.tipo}|PS:${dados.ps}|PREP:${dados.prepFormatado}`;
-              gerarQRCode(textoQR, qrContainer);
-            }
-
-            container.appendChild(etiqueta);
-          }
-
-          document.getElementById('previewContainer').style.display = 'block';
-        }
-
-        // Função para obter dados do formulário
-        function obterDadosFormulario() {
-          return {
-            tipo: document.getElementById('tipo').value,
-            ps: document.getElementById('ps').value,
-            prep: document.getElementById('prep').value,
-            prepFormatado: formatarData(document.getElementById('prep').value),
-            quantidade: document.getElementById('quantidade').value
-          };
-        }
-
-        // Função para gerar documento Word
-        async function gerarDocumentoWord() {
-          Swal.fire({
-            title: 'Gerando documento...',
-            text: 'Aguarde enquanto criamos seu arquivo Word.',
-            allowOutsideClick: false,
-            didOpen: () => {
-              Swal.showLoading();
-            }
-          });
-
-          try {
-            // Obter dados do formulário
-            const dados = obterDadosFormulario();
-            const quantidade = parseInt(dados.quantidade);
-
-            // Importar a biblioteca docx corretamente
-            const { Document, Paragraph, Table, TableCell, TableRow, TextRun, WidthType, AlignmentType, BorderStyle, convertInchesToTwip, Packer } = docx;
-
-            // Criar células da tabela para as etiquetas
-            const etiquetas = [];
-
-            for (let i = 0; i < quantidade; i++) {
-              // Conteúdo da etiqueta
-              const conteudoEtiqueta = [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: "Teste de Preparo",
-                      bold: true,
-                      size: 20,
-                    })
-                  ],
-                  alignment: AlignmentType.CENTER,
-                  spacing: { after: 200 }
-                }),
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: dados.tipo,
-                      bold: true,
-                      size: 18,
-                    })
-                  ],
-                  alignment: AlignmentType.CENTER,
-                  spacing: { after: 200 }
-                }),
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: `PS. ${dados.ps}`,
-                      size: 16,
-                    })
-                  ],
-                  spacing: { after: 150 }
-                }),
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: `PREP: ${dados.prepFormatado}`,
-                      size: 16,
-                    })
-                  ],
-                  spacing: { after: 150 }
-                })
-              ];
-
-              // Criar célula com borda para simular etiqueta
-              etiquetas.push(new TableCell({
-                children: conteudoEtiqueta,
-                width: {
-                  size: convertInchesToTwip(2), // Aproximadamente 5cm
-                  type: WidthType.DXA,
-                },
-                margins: {
-                  top: 100,
-                  bottom: 100,
-                  left: 100,
-                  right: 100,
-                },
-                borders: {
-                  top: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
-                  bottom: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
-                  left: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
-                  right: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
-                },
-              }));
-            }
-
-            // Organizar etiquetas em uma tabela (4 por linha)
-            const linhasTabela = [];
-            for (let i = 0; i < etiquetas.length; i += 4) {
-              const celulasLinha = etiquetas.slice(i, i + 4);
-              // Preencher com células vazias se necessário
-              while (celulasLinha.length < 4) {
-                celulasLinha.push(new TableCell({
-                  children: [new Paragraph("")],
-                  width: {
-                    size: convertInchesToTwip(2),
-                    type: WidthType.DXA,
-                  }
-                }));
-              }
-
-              linhasTabela.push(new TableRow({
-                children: celulasLinha,
-              }));
-            }
-
-            // Criar o documento
-            const doc = new Document({
-              sections: [{
-                properties: {},
-                children: [
-                  new Table({
-                    width: {
-                      size: 100,
-                      type: WidthType.PERCENTAGE,
-                    },
-                    rows: linhasTabela,
-                  }),
-                ],
-              }],
-            });
-
-            // Gerar o documento e fazer o download
-            const blob = await Packer.toBlob(doc);
-            saveAs(blob, "etiquetas_preparo.docx");
-
-            Swal.fire({
-              icon: 'success',
-              title: 'Documento gerado!',
-              text: 'O arquivo Word com as etiquetas foi criado com sucesso.',
-              confirmButtonText: 'OK'
-            });
-
-          } catch (error) {
-            console.error("Erro ao gerar documento:", error);
-            Swal.fire({
-              icon: 'error',
-              title: 'Erro',
-              text: 'Ocorreu um erro ao gerar o documento. Tente novamente.',
-              confirmButtonText: 'Entendi'
-            });
-          }
+      // Botão de pré-visualização
+      document.getElementById('btnPreview').addEventListener('click', function () {
+        if (validarFormulario()) {
+          gerarPreview();
         }
       });
-    </script>
-  </body>
+
+      // Botão de gerar PDF
+      document.getElementById('btnGerarPDF').addEventListener('click', function () {
+        if (validarFormulario()) {
+          gerarPDF();
+        }
+      });
+
+      // Função para validar formulário
+      function validarFormulario() {
+        const camposObrigatorios = ['tipo', 'ps', 'prep'];
+        const camposFaltando = [];
+
+        camposObrigatorios.forEach(campo => {
+          const elemento = document.getElementById(campo);
+          if (!elemento.value) {
+            camposFaltando.push(elemento.previousElementSibling.textContent.replace(' *', ''));
+          }
+        });
+
+        if (camposFaltando.length > 0) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Campos obrigatórios',
+            html: `Os seguintes campos são obrigatórios:<br><strong>${camposFaltando.join(', ')}</strong>`,
+            confirmButtonText: 'Entendi'
+          });
+          return false;
+        }
+        return true;
+      }
+
+      // Função para formatar data (DD/MM/AA)
+      function formatarData(dataISO) {
+        const data = new Date(dataISO);
+        const dia = String(data.getDate()).padStart(2, '0');
+        const mes = String(data.getMonth() + 1).padStart(2, '0');
+        const ano = String(data.getFullYear()).slice(-2);
+        return `${dia}/${mes}/${ano}`;
+      }
+
+      // Função para gerar QR Code
+      function gerarQRCode(texto, container) {
+        const tipoNumero = 0;
+        const correcaoErro = 'L';
+        const qr = qrcode(tipoNumero, correcaoErro);
+        qr.addData(texto);
+        qr.make();
+        container.innerHTML = qr.createImgTag(5);
+      }
+
+      // Função para gerar pré-visualização das etiquetas
+      function gerarPreview() {
+        const container = document.getElementById('etiquetasPreview');
+        container.innerHTML = '';
+
+        const quantidade = parseInt(document.getElementById('quantidade').value);
+        const dados = obterDadosFormulario();
+
+        for (let i = 0; i < quantidade; i++) {
+          const etiqueta = document.createElement('div');
+          etiqueta.className = 'etiqueta-preview';
+
+          let conteudo = `
+            <div class="etiqueta-content">
+              <div class="etiqueta-header">Teste de Preparo</div>
+              <div class="etiqueta-body">
+                <div style="text-align: center; margin-bottom: 10px; font-weight: bold;">
+                  ${dados.tipo}
+                </div>
+                <div style="margin-bottom: 5px;">PS. ${dados.ps}</div>
+                <div style="margin-bottom: 5px;">PREP: ${dados.prepFormatado}</div>
+              </div>
+          `;
+
+          if (document.getElementById('incluirQRCode').checked) {
+            conteudo += `<div class="qrcode-container"></div>`;
+          }
+
+          conteudo += `</div>`;
+          etiqueta.innerHTML = conteudo;
+
+          if (document.getElementById('incluirQRCode').checked) {
+            const qrContainer = etiqueta.querySelector('.qrcode-container');
+            const textoQR = `Teste de Preparo | ${dados.tipo} | PS:${dados.ps} | PREP:${dados.prepFormatado}`;
+            gerarQRCode(textoQR, qrContainer);
+          }
+
+          container.appendChild(etiqueta);
+        }
+
+        document.getElementById('previewContainer').style.display = 'block';
+      }
+
+      // Função para obter dados do formulário
+      function obterDadosFormulario() {
+        return {
+          tipo: document.getElementById('tipo').value,
+          ps: document.getElementById('ps').value,
+          prep: document.getElementById('prep').value,
+          prepFormatado: formatarData(document.getElementById('prep').value),
+          quantidade: document.getElementById('quantidade').value
+        };
+      }
+
+      // Função para gerar o PDF
+      async function gerarPDF() {
+        Swal.fire({
+          title: 'Gerando PDF...',
+          text: 'Aguarde enquanto criamos seu arquivo.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        try {
+          const { jsPDF } = window.jspdf;
+          const etiquetas = document.getElementById("etiquetasPreview");
+
+          const canvas = await html2canvas(etiquetas, { scale: 2 });
+          const imgData = canvas.toDataURL("image/png");
+
+          const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: "a4"
+          });
+
+          const imgWidth = 210;
+          const pageHeight = 297;
+          const imgHeight = canvas.height * imgWidth / canvas.width;
+          let heightLeft = imgHeight;
+          let position = 0;
+
+          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+
+          while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+          }
+
+          pdf.save("etiquetas_preparo.pdf");
+
+          Swal.fire({
+            icon: 'success',
+            title: 'PDF gerado!',
+            text: 'O arquivo foi criado com sucesso.',
+            confirmButtonText: 'OK'
+          });
+
+        } catch (error) {
+          console.error(error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'Ocorreu um erro ao gerar o PDF.',
+            confirmButtonText: 'Entendi'
+          });
+        }
+      }
+    });
+  </script>
+</body>
 
 </html>
